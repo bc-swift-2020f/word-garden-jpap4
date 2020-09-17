@@ -79,7 +79,38 @@ var uppercased = crazyCaps.uppercased()
 var lowercased = crazyCaps.lowercased()
 var capitalized = crazyCaps.capitalized
 
-print(crazyCaps)
-print(uppercased, lowercased, capitalized)
 
+print(uppercased, lowercased, capitalized)
+print(crazyCaps)
+
+var wordToGuess = "SWIFT"
+var revealedWord = "_"
+
+var lengthOfWord = wordToGuess.count
+
+for _ in 1...wordToGuess.count - 1 {
+    revealedWord = revealedWord + " _"
+}
+//revealedWord.removeLast()
+print("\(wordToGuess) will show as '\(revealedWord)'")
+
+// create a string from a repeating value
+revealedWord = "_" + String(repeating: " _", count: wordToGuess.count - 1)
+print("using repeating String: '\(revealedWord)'")
+
+wordToGuess = "STARWARS"
+var lettersGuessed = "SQFTXW"
+revealedWord = ""
+
+for letter in wordToGuess {
+    if lettersGuessed.contains(letter) {
+        revealedWord = revealedWord + "\(letter) "
+    } else {
+        revealedWord = revealedWord + "_ "
+    }
+}
+revealedWord.removeLast()
+print("wordToGuess:\(wordToGuess)")
+print("lettersGuessed: \(lettersGuessed)")
+print("revealedWord: \(revealedWord)")
 
