@@ -25,8 +25,11 @@ class ViewController: UIViewController {
     var currentWordIndex = 0
     var wordToGuess = ""
     var lettersGuessed = ""
-    let MaxNumberOfWrongGuesses = 8
+    let maxNumberOfWrongGuesses = 8
     var wrongGuessesRemaining = 8
+    var wordsGuessedCount = 0
+    var wordsMissedCount = 0
+    var guessCount = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,6 +37,7 @@ class ViewController: UIViewController {
         guessLetterButton.isEnabled = !(text.isEmpty)
         wordToGuess = wordsToGuess[currentWordIndex]
         wordBeingRevealedLabel.text = "_" + String(repeating: " _", count: wordToGuess.count - 1)
+        updateGameStatusLabels()
 
     }
     
@@ -44,7 +48,6 @@ class ViewController: UIViewController {
     }
     
     func formatRevealedWord() {
-        
         //format and show revealedWord in the wordBeingRevealedLabel to include new guess
         var revealedWord = ""
         
@@ -60,6 +63,23 @@ class ViewController: UIViewController {
         wordBeingRevealedLabel.text = revealedWord
     }
     
+    func updateAfterWinOrLose() {
+        currentWordIndex += 1
+        guessedLetterTextField.isEnabled = false
+        guessLetterButton.isEnabled = false
+        playAgainButton.isHidden = false
+        
+        updateGameStatusLabels()
+        
+    }
+    
+    func updateGameStatusLabels () {
+        wordsGuessedLabel.text = "Words Guessed: \(wordsGuessedCount)"
+        wordsMissedLabel.text = "Words Missed: \(wordsMissedCount)"
+        wordsRemainingLabel.text = "Words to Guess: \(wordsToGuess.count - (wordsGuessedCount + wordsMissedCount))"
+        wordsInGameLabel.text = "Words in Game: \(wordsToGuess.count)"
+    }
+    
     func guessALetter() {
         // get current letter guessed and add it to all lettersGuessed
         let currentLetterGuessed = guessedLetterTextField.text!
@@ -71,6 +91,29 @@ class ViewController: UIViewController {
         if wordToGuess.contains(currentLetterGuessed) == false {
             wrongGuessesRemaining = wrongGuessesRemaining - 1
             flowerImageView.image = UIImage(named: "flower\(wrongGuessesRemaining)")
+        }
+        
+        // update gameStatusMessageLabel
+        guessCount += 1
+        let guesses = (guessCount == 1 ? "Guess" : "Guesses")
+        gameStatusMessageLabel.text = "You've Made \(guessCount) \(guesses)"
+        
+        //after each guess, check to see if 2 things happen:
+        // 1) the user won the game
+        // 2) the user lost the game
+        
+        if wordBeingRevealedLabel.text!.contains("_") == false {
+            gameStatusMessageLabel.text = "You've guessed it! It took you \(guessCount) guesses to guess the word"
+            wordsGuessedCount += 1
+            updateAfterWinOrLose()
+        } else if wrongGuessesRemaining == 0 {
+            gameStatusMessageLabel.text = "So sorry. You're all out of guesses"
+            wordsMissedCount += 1
+            updateAfterWinOrLose()
+        }
+            
+        if currentWordIndex == wordsToGuess.count {
+            gameStatusMessageLabel.text! += "\n\nYou've tried all of the words! Restart from the beginning?"
         }
     }
     
@@ -90,6 +133,24 @@ class ViewController: UIViewController {
     }
     
     @IBAction func playAgainButtonPressed(_ sender: UIButton) {
+        if currentWordIndex == wordToGuess.count {
+            currentWordIndex = 0
+            wordsGuessedCount = 0
+            wordsMissedCount = 0
+        }
+        
+        playAgainButton.isHidden = true
+        guessedLetterTextField.isEnabled = true
+        guessLetterButton.isEnabled = false
+        wordToGuess = wordsToGuess[currentWordIndex]
+        wrongGuessesRemaining = maxNumberOfWrongGuesses
+        wordBeingRevealedLabel.text = "_" + String(repeating: " _", count: wordToGuess.count - 1)
+        guessCount = 0
+        flowerImageView.image = UIImage(named: "flower\(maxNumberOfWrongGuesses)")
+        lettersGuessed = ""
+        updateGameStatusLabels()
+        gameStatusMessageLabel.text = "You've Made 0 Guesses"
+        
     }
     
 
